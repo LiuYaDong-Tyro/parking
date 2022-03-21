@@ -3,14 +3,20 @@ provider "aws" {
   profile = "tw-aws-beach"
 }
 
-resource "aws_dynamodb_table" "my_first_table" {
+resource "aws_dynamodb_table" "car_parking_table" {
   name         = var.table_name
   billing_mode = var.table_billing_mode
-  hash_key     = "employee-id"
+  hash_key     = "car-state"
+  range_key    = "time"
   attribute {
-    name = "employee-id"
+    name = "car-state"
     type = "S"
   }
+  attribute {
+    name = "time"
+    type = "S"
+  }
+
   tags = {
     environment = var.environment
   }

@@ -1,6 +1,6 @@
 variable "table_name" {
-  description = "Dynamodb table name (space is not allowed)"
-  default     = "my-first-test-table"
+  description = "car parking service"
+  default     = "parking"
 }
 
 variable "table_billing_mode" {
@@ -9,6 +9,6 @@ variable "table_billing_mode" {
 }
 
 variable "environment" {
-  description = "Name of environment"
+  description = "car parking environment"
   default     = "test"
 }
