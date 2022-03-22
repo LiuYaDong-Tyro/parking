@@ -13,4 +13,7 @@ def do_calculate(event, context):
 
     message = 'Hello {} {}!'.format(event['first_name'], event['last_name'])
 
+    print("event is " + event)
+    print("context is " + context)
+
     return "haha, " + message
