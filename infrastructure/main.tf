@@ -45,7 +45,7 @@ resource "aws_iot_topic_rule" "car_out_rule" {
 
 resource "aws_lambda_function" "cat_in_function" {
   filename = "car_in_match.zip"
-  function_name = "match"
+  function_name = "do_enter"
   handler = "car_in_match.match"
   role = aws_iam_role.iam_for_lambda.arn
   source_code_hash = data.archive_file.car_in_function_source.output_base64sha256
@@ -60,7 +60,7 @@ data "archive_file" "car_in_function_source" {
 
 resource "aws_lambda_function" "cat_out_function" {
   filename = "car_out_match.zip"
-  function_name = "calculate"
+  function_name = "do_calculate"
   handler = "car_out_match.calculate"
   role = aws_iam_role.iam_for_lambda.arn
   source_code_hash = data.archive_file.car_out_function_source.output_base64sha256

@@ -1,8 +1,8 @@
 import time
 
 
-def calculate(event, context):
-    print("########## this is car in function ##########")
+def do_calculate(event, context):
+    print("########## this is car out function ##########")
     print("Lambda function ARN:", context.invoked_function_arn)
     print("CloudWatch log stream name:", context.log_stream_name)
     print("CloudWatch log group name:",  context.log_group_name)
