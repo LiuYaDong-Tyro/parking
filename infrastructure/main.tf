@@ -50,6 +50,7 @@ resource "aws_lambda_function" "cat_in_function" {
   role             = aws_iam_role.iam_for_lambda.arn
   source_code_hash = data.archive_file.car_in_function_source.output_base64sha256
   runtime          = "python3.8"
+  timeout          = 100
 }
 
 data "archive_file" "car_in_function_source" {
@@ -65,6 +66,7 @@ resource "aws_lambda_function" "cat_out_function" {
   role             = aws_iam_role.iam_for_lambda.arn
   source_code_hash = data.archive_file.car_out_function_source.output_base64sha256
   runtime          = "python3.8"
+  timeout          = 100
 }
 
 data "archive_file" "car_out_function_source" {
@@ -74,9 +76,9 @@ data "archive_file" "car_out_function_source" {
 }
 
 resource "aws_iam_role" "iam_for_lambda" {
-  name = "iam_for_lambda"
-
-  assume_role_policy = <<EOF
+  name                = "iam_for_lambda"
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"]
+  assume_role_policy  = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [

@@ -1,16 +1,72 @@
-import time
+import os
+
+import boto3
 
 
 def do_enter(event, context):
-    print("----------- this is car in function -----------")
-    print("Lambda function ARN:", context.invoked_function_arn)
-    print("CloudWatch log stream name:", context.log_stream_name)
-    print("CloudWatch log group name:",  context.log_group_name)
-    print("Lambda Request ID:", context.aws_request_id)
-    print("Lambda function memory limits in MB:", context.memory_limit_in_mb)
-    time.sleep(1)
-    print("Lambda time remaining in MS:", context.get_remaining_time_in_millis())
+    print(os.environ)
+    find_current_count()
+    # find in db count
+    current_total_count = 1
+    max_total_count = 100
+    if current_total_count >= max_total_count:
+        return "The parking space is full, no parking space is available"
+    else:
+        car_no = event['car_no']
+        return "welcome " + car_no + ", then open the door"
 
-    message = 'Hello {} {}!'.format(event['first_name'], event['last_name'])
 
-    return "haha, " + message
+def find_current_count():
+    # Get the service resource.
+    dynamodb = boto3.resource('dynamodb')
+
+    # Create the DynamoDB table.
+    table = dynamodb.create_table(
+        TableName='users',
+        KeySchema=[
+            {
+                'AttributeName': 'username',
+                'KeyType': 'HASH'
+            },
+            {
+                'AttributeName': 'last_name',
+                'KeyType': 'RANGE'
+            }
+        ],
+        AttributeDefinitions=[
+            {
+                'AttributeName': 'username',
+                'AttributeType': 'S'
+            },
+            {
+                'AttributeName': 'last_name',
+                'AttributeType': 'S'
+            },
+        ],
+        ProvisionedThroughput={
+            'ReadCapacityUnits': 5,
+            'WriteCapacityUnits': 5
+        }
+    )
+
+
+    # Wait until the table exists.
+    table.wait_until_exists()
+
+
+    table.put_item(
+        Item={
+            'username': 'janedoe',
+            'first_name': 'Jane',
+            'last_name': 'Doe',
+            'age': 25,
+            'account_type': 'standard_user',
+        }
+    )
+
+    # Print out some data about the table.
+    print(table.item_count)
+
+
+
+
