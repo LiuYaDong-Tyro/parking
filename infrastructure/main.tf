@@ -58,6 +58,21 @@ data "archive_file" "car_in_function_source" {
   output_path = "car_in_match.zip"
 }
 
+resource "aws_lambda_function" "cat_out_function" {
+  filename = "car_out_match.zip"
+  function_name = "calculate"
+  handler = "car_out_match.calculate"
+  role = aws_iam_role.iam_for_lambda.arn
+  source_code_hash = data.archive_file.car_out_function_source.output_base64sha256
+  runtime       = "python3.8"
+}
+
+data "archive_file" "car_out_function_source" {
+  type        = "zip"
+  source_file = "./car_out_calculate.py"
+  output_path = "car_out_calculate.zip"
+}
+
 resource "aws_iam_role" "iam_for_lambda" {
   name = "iam_for_lambda"
 

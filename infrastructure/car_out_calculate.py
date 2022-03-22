@@ -1,7 +1,7 @@
 import time
 
 
-def match(event, context):
+def calculate(event, context):
     print("########## this is car in function ##########")
     print("Lambda function ARN:", context.invoked_function_arn)
     print("CloudWatch log stream name:", context.log_stream_name)
