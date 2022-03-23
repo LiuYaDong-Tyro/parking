@@ -6,14 +6,14 @@ provider "aws" {
 resource "aws_dynamodb_table" "car_parking_table" {
   name         = var.table_name
   billing_mode = var.table_billing_mode
-  hash_key     = "car-state"
-  range_key    = "time"
+  hash_key     = "car_no"
+  range_key    = "car_state"
   attribute {
-    name = "car-state"
+    name = "car_no"
     type = "S"
   }
   attribute {
-    name = "time"
+    name = "car_state"
     type = "S"
   }
 
