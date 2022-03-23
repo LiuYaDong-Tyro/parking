@@ -1,8 +1,8 @@
 import os
+import time
 
 import boto3
-from boto3.dynamodb.conditions import Key, Attr
-import time
+from boto3.dynamodb.conditions import Key
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('parking')
@@ -31,30 +31,29 @@ def save_to_db(car_no):
     )
 
 
+def trigger_job(car_no):
+
+    pass
+
+
 def validate_count(max_total_count, car_no):
     is_full = validate_current_count(max_total_count)
     if is_full:
         return "The parking space is full, no parking space is available"
     else:
         save_to_db(car_no)
+        trigger_job(car_no)
         return "welcome " + car_no + ", then open the door"
 
 
 def do_enter(event, context):
     print(os.environ)
     car_no = event['car_no']
-    max_total_count = 12
+    max_total_count = 100
     return validate_count(max_total_count, car_no)
 
 
 def find_current_count(car_no):
-    table.put_item(
-        Item={
-            'car_state': 'car_in',
-            'car_no': '陕A-00001',
-            'time': int(time.time()),
-        }
-    )
     response = table.query(
         KeyConditionExpression=Key('car_no').eq(car_no) & Key('car_state').eq("car_in")
     )

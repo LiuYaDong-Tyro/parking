@@ -1,16 +1,46 @@
 import time
+from datetime import datetime
+import boto3
+from boto3.dynamodb.conditions import Key
+import decimal
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('parking')
 
 
 def do_calculate(event, context):
-    print("########## this is car out function ##########")
-    print("Lambda function ARN:", context.invoked_function_arn)
-    print("CloudWatch log stream name:", context.log_stream_name)
-    print("CloudWatch log group name:",  context.log_group_name)
-    print("Lambda Request ID:", context.aws_request_id)
-    print("Lambda function memory limits in MB:", context.memory_limit_in_mb)
-    time.sleep(1)
-    print("Lambda time remaining in MS:", context.get_remaining_time_in_millis())
+    car_no = event['car_no']
+    response = table.query(
+        KeyConditionExpression=Key('car_no').eq(car_no) & Key('car_state').eq("car_in")
+    )
+    items = response['Items']
+    if len(items) > 1:
+        return "system error"
+    else:
+        unit_price = 0.05
+        print("unit price is " + str(unit_price))
+        car_in_time = int(items[0]['time'])
+        print("car_in_time is " + str(car_in_time))
+        car_out_time = int(time.time())
+        print("car_out_time is " + str(car_out_time))
+        cost_time = car_out_time - car_in_time
+        time_mins = round(cost_time / 60)
+        print("cost time is " + str(time_mins) + "mins")
+        cost_fee = time_mins * unit_price
+        print("cost fee is " + str(cost_fee))
+        save_to_db(car_no, car_out_time)
+        car_in = datetime.fromtimestamp(car_in_time)
+        car_out = datetime.fromtimestamp(car_out_time)
+        fee = str(cost_fee)
+        return "car in time: " + str(car_in) + ";car out time is " \
+               + str(car_out) + ";cost fee is " + fee
 
-    message = 'Hello {} {}!'.format(event['first_name'], event['last_name'])
 
-    return "haha, " + message
+def save_to_db(car_no, car_out_time):
+    table.put_item(
+        Item={
+            'car_state': 'car_out',
+            'car_no': car_no,
+            'time': car_out_time,
+        }
+    )
