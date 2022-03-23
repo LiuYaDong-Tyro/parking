@@ -4,26 +4,50 @@ import boto3
 from boto3.dynamodb.conditions import Key, Attr
 import time
 
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('parking')
+
+
+def validate_current_count(limit_count):
+    response = table.query(
+        KeyConditionExpression=Key('car_state').eq("car_in")
+    )
+    items = response['Items']
+    current_count = len(items)
+    print("count is " + str(current_count))
+    if current_count >= limit_count:
+        return True
+    else:
+        return False
+
+
+def save_to_db(car_no):
+    table.put_item(
+        Item={
+            'car_state': 'car_in',
+            'car_no': car_no,
+            'time': int(time.time()),
+        }
+    )
+
+
+def validate_count(max_total_count, car_no):
+    is_full = validate_current_count(max_total_count)
+    if is_full:
+        return "The parking space is full, no parking space is available"
+    else:
+        save_to_db(car_no)
+        return "welcome " + car_no + ", then open the door"
+
 
 def do_enter(event, context):
     print(os.environ)
     car_no = event['car_no']
-    find_current_count(car_no)
-    # find in db count
-    current_total_count = 1
-    max_total_count = 100
-    if current_total_count >= max_total_count:
-        return "The parking space is full, no parking space is available"
-    else:
-        return "welcome " + car_no + ", then open the door"
+    max_total_count = 12
+    return validate_count(max_total_count, car_no)
 
 
 def find_current_count(car_no):
-    # Get the service resource.
-    dynamodb = boto3.resource('dynamodb')
-
-    table = dynamodb.Table('parking')
-
     table.put_item(
         Item={
             'car_state': 'car_in',
@@ -31,16 +55,11 @@ def find_current_count(car_no):
             'time': int(time.time()),
         }
     )
-
-
     response = table.query(
         KeyConditionExpression=Key('car_no').eq(car_no) & Key('car_state').eq("car_in")
     )
     items = response['Items']
     print(items)
-
-
-    # Print out some data about the table.
     print(table.item_count)
 
 
