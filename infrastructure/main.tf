@@ -41,6 +41,9 @@ resource "aws_iot_topic_rule" "car_out_rule" {
   enabled     = true
   sql         = "SELECT * FROM 'topic/car' where state = 'car_out'"
   sql_version = "2016-03-23"
+  lambda {
+    function_arn = aws_lambda_function.cat_out_function.arn
+  }
 }
 
 resource "aws_lambda_function" "cat_in_function" {
