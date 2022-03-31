@@ -1,3 +1,4 @@
+import json
 import os
 import time
 
@@ -6,6 +7,8 @@ from boto3.dynamodb.conditions import Key
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('parking')
+
+client = boto3.client('sns')
 
 
 def validate_current_count(limit_count):
@@ -31,19 +34,24 @@ def save_to_db(car_no):
     )
 
 
-def trigger_job(car_no):
-
-    pass
+def send_sns(message):
+    response = client.publish(
+        TopicArn='arn:aws:sns:ap-southeast-2:160071257600:car_info',
+        Message=json.dumps({'message': message}),
+    )
 
 
 def validate_count(max_total_count, car_no):
     is_full = validate_current_count(max_total_count)
     if is_full:
-        return "The parking space is full, no parking space is available"
+        message = "The parking space is full, no parking space is available"
+        send_sns(message)
+        return message
     else:
         save_to_db(car_no)
-        trigger_job(car_no)
-        return "welcome " + car_no + ", then open the door"
+        message = "welcome " + car_no + ", then open the door"
+        send_sns(message)
+        return message
 
 
 def do_enter(event, context):

@@ -80,7 +80,7 @@ data "archive_file" "car_out_function_source" {
 
 resource "aws_iam_role" "iam_for_lambda" {
   name                = "iam_for_lambda"
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess", "arn:aws:iam::aws:policy/AmazonSNSFullAccess"]
   assume_role_policy  = <<EOF
 {
   "Version": "2012-10-17",
