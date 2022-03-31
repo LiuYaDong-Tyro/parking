@@ -1,4 +1,3 @@
-import json
 import os
 import time
 
@@ -35,9 +34,10 @@ def save_to_db(car_no):
 
 
 def send_sns(message):
+    print(message)
     response = client.publish(
         TopicArn='arn:aws:sns:ap-southeast-2:160071257600:car_info',
-        Message=json.dumps({'message': message}),
+        Message=message,
     )
 
 
