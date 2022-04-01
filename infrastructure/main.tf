@@ -47,18 +47,18 @@ resource "aws_iot_topic_rule" "car_out_rule" {
 }
 
 resource "aws_lambda_permission" "allow_car_in_rule" {
-  statement_id  = "AllowExecutionFromCloudWatch"
+  statement_id  = "AllowExecutionFromRule"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.car_in_function.function_name
-  principal     = "events.amazonaws.com"
+  principal     = "iot.amazonaws.com"
   source_arn    = "arn:aws:iot:ap-southeast-2:160071257600:rule/car_in"
 }
 
 resource "aws_lambda_permission" "allow_car_out_rule" {
-  statement_id  = "AllowExecutionFromCloudWatch"
+  statement_id  = "AllowExecutionFromRule"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.car_out_function.function_name
-  principal     = "events.amazonaws.com"
+  principal     = "iot.amazonaws.com"
   source_arn    = "arn:aws:iot:ap-southeast-2:160071257600:rule/car_out"
 }
 
