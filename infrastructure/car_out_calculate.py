@@ -7,6 +7,8 @@ import decimal
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('parking')
 
+client = boto3.client('sns')
+
 
 def do_calculate(event, context):
     car_no = event['car_no']
@@ -32,8 +34,17 @@ def do_calculate(event, context):
         car_in = datetime.fromtimestamp(car_in_time)
         car_out = datetime.fromtimestamp(car_out_time)
         fee = str(cost_fee)
-        return "car in time: " + str(car_in) + ";car out time is " \
+        message = "car in time: " + str(car_in) + ";car out time is " \
                + str(car_out) + ";cost fee is " + fee
+        send_sns(message)
+
+
+def send_sns(message):
+    print(message)
+    client.publish(
+        TopicArn='arn:aws:sns:ap-southeast-2:160071257600:car_info',
+        Message=message,
+    )
 
 
 def save_to_db(car_no, car_out_time):

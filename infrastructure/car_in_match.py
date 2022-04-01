@@ -35,7 +35,7 @@ def save_to_db(car_no):
 
 def send_sns(message):
     print(message)
-    response = client.publish(
+    client.publish(
         TopicArn='arn:aws:sns:ap-southeast-2:160071257600:car_info',
         Message=message,
     )
