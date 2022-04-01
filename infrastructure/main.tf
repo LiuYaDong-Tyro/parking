@@ -31,7 +31,7 @@ resource "aws_iot_topic_rule" "car_in_rule" {
   sql_version = "2016-03-23"
 
   lambda {
-    function_arn = aws_lambda_function.cat_in_function.arn
+    function_arn = aws_lambda_function.car_in_function.arn
   }
 }
 
@@ -42,11 +42,27 @@ resource "aws_iot_topic_rule" "car_out_rule" {
   sql         = "SELECT * FROM 'topic/car' where state = 'car_out'"
   sql_version = "2016-03-23"
   lambda {
-    function_arn = aws_lambda_function.cat_out_function.arn
+    function_arn = aws_lambda_function.car_out_function.arn
   }
 }
 
-resource "aws_lambda_function" "cat_in_function" {
+resource "aws_lambda_permission" "allow_car_in_rule" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.car_in_function.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = "arn:aws:iot:ap-southeast-2:160071257600:rule/car_in"
+}
+
+resource "aws_lambda_permission" "allow_car_out_rule" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.car_out_function.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = "arn:aws:iot:ap-southeast-2:160071257600:rule/car_out"
+}
+
+resource "aws_lambda_function" "car_in_function" {
   filename         = "car_in_match.zip"
   function_name    = "do_enter"
   handler          = "car_in_match.do_enter"
@@ -62,7 +78,7 @@ data "archive_file" "car_in_function_source" {
   output_path = "car_in_match.zip"
 }
 
-resource "aws_lambda_function" "cat_out_function" {
+resource "aws_lambda_function" "car_out_function" {
   filename         = "car_out_calculate.zip"
   function_name    = "do_calculate"
   handler          = "car_out_calculate.do_calculate"
